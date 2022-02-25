@@ -3,7 +3,7 @@ import os
 
 import click
 
-from stactools.sentinel1.grd.stac import create_item
+from stactools.sentinel1.grd.stac import create_item, create_item_from_zip
 
 logger = logging.getLogger(__name__)
 
@@ -20,14 +20,18 @@ def grd_cmd():
 )
 @click.argument("src")
 @click.argument("dst")
-def create_item_command(src, dst):
+@click.option("--zip/--no-zip", default=False)
+def create_item_command(src, dst, zip):
     """Creates a STAC Collection
 
     Args:
         src (str): path to the scene
         dst (str): path to the STAC Item JSON file that will be created
     """
-    item = create_item(src)
+    if not zip:
+        item = create_item(src)
+    else:
+        item = create_item_from_zip(src)
 
     item_path = os.path.join(dst, "{}.json".format(item.id))
     item.set_self_href(item_path)
