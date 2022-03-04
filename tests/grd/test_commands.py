@@ -23,8 +23,51 @@ class CreateItemTest(CliTestCase):
 
         with self.subTest(granule_href):
             with TemporaryDirectory() as tmp_dir:
+                cmd = ["sentinel1", "grd", "create-item", granule_href, tmp_dir]
+                self.run_command(cmd)
+
+                jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
+                self.assertEqual(len(jsons), 1)
+                fname = jsons[0]
+
+                item = pystac.Item.from_file(os.path.join(tmp_dir, fname))
+
+                item.validate()
+
+                self.assertEqual(item.id, item_id)
+
+                bands_seen = set()
+
+                for _, asset in item.assets.items():
+                    # Ensure that there's no relative path parts
+                    # in the asset HREFs
+                    self.assertTrue("/./" not in asset.href)
+                    self.assertTrue(is_absolute_href(asset.href))
+                    asset_eo = EOExtension.ext(asset)
+                    bands = asset_eo.bands
+                    if bands is not None:
+                        bands_seen |= set(b.name for b in bands)
+
+                [
+                    self.assertTrue(x.lower() in list(SENTINEL_POLARISATIONS.keys()))
+                    for x in bands_seen
+                ]
+
+    def test_create_item_from_zip(self):
+        item_id = "S1A_IW_GRDH_1SDV_20220225T052631_20220225T052656_042065_0502D5_95B6"
+        granule_href = test_data.get_path(
+            "data-files/grd/S1A_IW_GRDH_1SDV_20220225T052631_20220225T052656_042065_0502D5_95B6.zip"  # noqa
+        )
+
+        with self.subTest(granule_href):
+            with TemporaryDirectory() as tmp_dir:
                 cmd = [
-                    "sentinel1", "grd", "create-item", granule_href, tmp_dir
+                    "sentinel1",
+                    "grd",
+                    "create-item",
+                    granule_href,
+                    tmp_dir,
+                    "--zip",
                 ]
                 self.run_command(cmd)
 
@@ -51,7 +94,6 @@ class CreateItemTest(CliTestCase):
                         bands_seen |= set(b.name for b in bands)
 
                 [
-                    self.assertTrue(
-                        x.lower() in list(SENTINEL_POLARISATIONS.keys()))
+                    self.assertTrue(x.lower() in list(SENTINEL_POLARISATIONS.keys()))
                     for x in bands_seen
                 ]

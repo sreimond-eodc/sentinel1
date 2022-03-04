@@ -1,6 +1,5 @@
-import tempfile
-import zipfile
 import os
+import zipfile
 from contextlib import contextmanager
 
 

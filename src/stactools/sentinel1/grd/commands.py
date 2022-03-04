@@ -1,9 +1,11 @@
+from gc import collect
 import logging
 import os
 
 import click
 
-from stactools.sentinel1.grd.stac import create_item, create_item_from_zip
+from stactools.sentinel1.grd.stac import create_item, create_item_from_zip, create_collection
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,3 +39,22 @@ def create_item_command(src, dst, zip):
     item.set_self_href(item_path)
 
     item.save_object()
+
+
+@grd_cmd.command(
+    "create-collection",
+    short_help="Create a Sentinel1 GRD STAC collection",
+)
+@click.argument("dst")
+def create_collection_command(dst):
+    """Creates a STAC Collection
+
+    Args:
+        dst (str): path to the STAC Collection JSON file that will be created
+    """
+    collection = create_collection()
+
+    collection_path = os.path.join(dst, "{}.json".format(collection.id))
+    collection.set_self_href(collection_path)
+
+    collection.save_object()
