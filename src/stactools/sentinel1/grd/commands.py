@@ -1,11 +1,11 @@
-from gc import collect
 import logging
 import os
+from gc import collect
 
 import click
 
-from stactools.sentinel1.grd.stac import create_item, create_item_from_zip, create_collection
-
+from stactools.sentinel1.grd.stac import (create_collection, create_item,
+                                          create_item_from_zip)
 
 logger = logging.getLogger(__name__)
 

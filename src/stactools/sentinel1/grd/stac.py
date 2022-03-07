@@ -1,23 +1,24 @@
-from gc import collect
 import logging
 import os
 import tempfile
+from gc import collect
 from typing import Optional
 
 import pystac
+from pystac.collection import Summaries
 from pystac.extensions.eo import EOExtension
 from pystac.extensions.sar import SarExtension
 from pystac.extensions.sat import SatExtension
 from stactools.core.io import ReadHrefModifier
 
+from stactools.sentinel1.grd import constants as c
+
 from . import Format
 from .bands import image_asset_from_href
-from stactools.sentinel1.grd import constants as c
 from .metadata_links import MetadataLinks
 from .product_metadata import ProductMetadata, get_shape
 from .properties import fill_sar_properties, fill_sat_properties
 from .utils import cd, get_vsizip_href, read_zipped_href
-from pystac.collection import Summaries
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +109,9 @@ def create_item(
 
     # s1 properties
     shape = get_shape(metalinks, read_href_modifier)
-    item.properties.update({**product_metadata.metadata_dict, "s1:shape": shape})
+    item.properties.update({
+        **product_metadata.metadata_dict, "s1:shape": shape
+    })
 
     # Add assets to item
     item.add_asset(*metalinks.create_manifest_asset())
@@ -133,8 +136,7 @@ def create_item(
             "are represented by a single composite colour image in RGB with the red channel "
             "(R) representing the  co-polarisation VV or HH), the green channel (G) "
             "represents the cross-polarisation (VH or HV) and the blue channel (B) "
-            "represents the ratio of the cross an co-polarisations."
-        )
+            "represents the ratio of the cross an co-polarisations.")
         item.add_asset(
             "thumbnail",
             pystac.Asset(
@@ -152,16 +154,13 @@ def create_item(
     elif archive_format == Format.COG:
         images_media_type = pystac.MediaType.COG
 
-    image_assets = dict(
-        [
-            image_asset_from_href(
-                os.path.join(granule_href, image_path),
-                item,
-                media_type=images_media_type,
-            )
-            for image_path in product_metadata.image_paths
-        ]
-    )
+    image_assets = dict([
+        image_asset_from_href(
+            os.path.join(granule_href, image_path),
+            item,
+            media_type=images_media_type,
+        ) for image_path in product_metadata.image_paths
+    ])
 
     for key, asset in image_assets.items():
         assert key not in item.assets
@@ -180,7 +179,9 @@ def create_item_from_zip(
 ) -> pystac.Item:
     with tempfile.TemporaryDirectory() as tmp_dir:
         with cd(tmp_dir):
-            item = create_item(granule_href=granule_href_zip, read_href_modifier=read_zipped_href)
+            item = create_item(granule_href=granule_href_zip,
+                               read_href_modifier=read_zipped_href)
             for asset in item.get_assets():
-                item.assets[asset].href = get_vsizip_href(item.assets[asset].get_absolute_href())
+                item.assets[asset].href = get_vsizip_href(
+                    item.assets[asset].get_absolute_href())
             return item

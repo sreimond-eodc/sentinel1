@@ -1,9 +1,9 @@
 import pystac
 from pystac import ProviderRole
+from pystac.extensions import sar
 from pystac.extensions.eo import Band
 from pystac.link import Link
 from pystac.utils import str_to_datetime
-from pystac.extensions import sar
 
 INSPIRE_METADATA_ASSET_KEY = "inspire-metadata"
 SAFE_MANIFEST_ASSET_KEY = "safe-manifest"
@@ -11,7 +11,8 @@ PRODUCT_METADATA_ASSET_KEY = "product-metadata"
 
 SENTINEL_LICENSE = Link(
     rel="license",
-    target="https://sentinel.esa.int/documents/" + "247904/690755/Sentinel_Data_Legal_Notice",
+    target="https://sentinel.esa.int/documents/" +
+    "247904/690755/Sentinel_Data_Legal_Notice",
 )
 
 ACQUISITION_MODES = [
@@ -33,19 +34,23 @@ SENTINEL_PROVIDER = pystac.Provider(
 )
 
 SENTINEL_POLARISATIONS = {
-    "vh": Band.create(
+    "vh":
+    Band.create(
         name="VH",
         description="VH band: vertical transmit and horizontal receive",
     ),
-    "hh": Band.create(
+    "hh":
+    Band.create(
         name="HH",
         description="HH band: horizontal transmit and horizontal receive",
     ),
-    "hv": Band.create(
+    "hv":
+    Band.create(
         name="HV",
         description="HV band: horizontal transmit and vertical receive",
     ),
-    "vv": Band.create(
+    "vv":
+    Band.create(
         name="VV",
         description="VV band: vertical transmit and vertical receive",
     ),
@@ -67,9 +72,7 @@ DESCRIPTION = (
     " of reduced spatial resolution. For the IW and EW GRD products, multi-looking is"
     " performed on each burst individually. All bursts in all sub-swaths are then"
     " seamlessly merged to form a single, contiguous, ground range, detected image per"
-    " polarisation."
-)
-
+    " polarisation.")
 
 BOUNDING_BOX = [-180.0, -90.0, 180.0, 90.0]
 TEMPORAL_EXTENT = [str_to_datetime("2014-10-03T00:00:00Z"), None]
@@ -80,7 +83,6 @@ EXTENT = pystac.Extent(
 )
 
 TITLE = "Sentinel-1 SAR L1 GRD"
-
 
 SENTINEL_INSTRUMENTS = ["c-sar"]
 SENTINEL_CONSTELLATION = "sentinel-1"

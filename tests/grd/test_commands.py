@@ -12,6 +12,7 @@ from tests import test_data
 
 
 class CreateItemTest(CliTestCase):
+
     def create_subcommand_functions(self):
         return [create_sentinel1_command]
 
@@ -23,7 +24,9 @@ class CreateItemTest(CliTestCase):
 
         with self.subTest(granule_href):
             with TemporaryDirectory() as tmp_dir:
-                cmd = ["sentinel1", "grd", "create-item", granule_href, tmp_dir]
+                cmd = [
+                    "sentinel1", "grd", "create-item", granule_href, tmp_dir
+                ]
                 self.run_command(cmd)
 
                 jsons = [p for p in os.listdir(tmp_dir) if p.endswith(".json")]
@@ -49,7 +52,8 @@ class CreateItemTest(CliTestCase):
                         bands_seen |= set(b.name for b in bands)
 
                 [
-                    self.assertTrue(x.lower() in list(SENTINEL_POLARISATIONS.keys()))
+                    self.assertTrue(
+                        x.lower() in list(SENTINEL_POLARISATIONS.keys()))
                     for x in bands_seen
                 ]
 
@@ -94,6 +98,7 @@ class CreateItemTest(CliTestCase):
                         bands_seen |= set(b.name for b in bands)
 
                 [
-                    self.assertTrue(x.lower() in list(SENTINEL_POLARISATIONS.keys()))
+                    self.assertTrue(
+                        x.lower() in list(SENTINEL_POLARISATIONS.keys()))
                     for x in bands_seen
                 ]
